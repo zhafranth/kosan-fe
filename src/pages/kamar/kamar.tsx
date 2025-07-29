@@ -3,11 +3,15 @@ import { useGetKamarDetail } from "@/networks/kamar";
 import { useParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { PlusCircle } from "lucide-react";
+import FormBooking from "./form-booking";
+import { useToggle } from "@/hooks/use-toggle";
 
 const Kamar = () => {
   const { id } = useParams();
   const { data: detail } = useGetKamarDetail(Number(id));
   const { no_room, status } = detail ?? {};
+
+  const { toggle, isOpen } = useToggle();
 
   // Data dummy penghuni (karena tidak ada data penghuni di API)
   const penghuni = {
@@ -143,10 +147,7 @@ const Kamar = () => {
               </p>
               <button
                 className="mt-4 text-blue-400 font-semibold py-3 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2"
-                onClick={() => {
-                  // Add user logic here
-                  console.log("Add new user clicked");
-                }}
+                onClick={toggle}
               >
                 <PlusCircle />
                 Tambah Penghuni
@@ -155,6 +156,7 @@ const Kamar = () => {
           )}
         </div>
       </div>
+      <FormBooking isOpen={isOpen} toggle={toggle} />
     </div>
   );
 };
