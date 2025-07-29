@@ -1,27 +1,19 @@
+import BackTitle from "@/components/dashboard/back-title";
+import { useGetKamarDetail } from "@/networks/kamar";
+import { useParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
-import { Button } from "@/components/ui/button";
+
 import { Label } from "@/components/ui/label";
 import { Select, SelectItem } from "@/components/ui/select";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { DatePicker } from "@/components/ui/date-picker";
-
-interface Props {
-  isOpen: boolean;
-  toggle: () => void;
-  // detail?: Kamar;
-  // type?: "create" | "edit";
-}
+import { User2Icon } from "lucide-react";
+import { useToggle } from "@/hooks/use-toggle";
+import FormPenyewa from "./_component/form-penyewa";
 
 // Definisi skema validasi dengan zod
 const formSchema = z.object({
@@ -35,12 +27,18 @@ const formSchema = z.object({
 // Tipe data untuk form
 type FormValues = z.infer<typeof formSchema>;
 
-const FormBooking = ({ isOpen, toggle }: Props) => {
+const Booking = () => {
+  const { id } = useParams();
+  const { data: detail } = useGetKamarDetail(Number(id));
+  const { no_room } = detail ?? {};
+
+  const { isOpen, toggle } = useToggle();
+
   const {
     handleSubmit,
     reset,
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -53,7 +51,6 @@ const FormBooking = ({ isOpen, toggle }: Props) => {
   });
 
   const onClose = () => {
-    toggle();
     reset();
   };
 
@@ -63,21 +60,31 @@ const FormBooking = ({ isOpen, toggle }: Props) => {
     // TODO: Implementasi submit data ke API
     onClose(); // Tutup drawer setelah submit
   };
-  return (
-    <Drawer open={isOpen} onOpenChange={toggle}>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>Tambah Penghuni</DrawerTitle>
-          <DrawerDescription>
-            Tambahkan penghuni baru untuk kamar ini.
-          </DrawerDescription>
-        </DrawerHeader>
 
-        <div className="px-4">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+  return (
+    <div className="container mx-auto py-8 px-4 max-w-2xl">
+      <BackTitle title={`Booking Kamar ${no_room}`} />
+
+      <div className="mt-6 bg-white rounded-xl shadow-lg border border-gray-200">
+        <div className="px-6 py-6 border-b border-gray-200">
+          <h1 className="text-2xl font-bold text-gray-800">
+            Form Booking Kamar
+          </h1>
+          <p className="text-gray-600 mt-2">
+            Silakan lengkapi informasi booking untuk kamar {no_room}
+          </p>
+        </div>
+
+        <div className="px-6 py-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* User ID Select */}
-            <div className="space-y-2">
-              <Label htmlFor="user_id">Pilih User</Label>
+            <div className="space-y-3">
+              <Label
+                htmlFor="user_id"
+                className="text-sm font-semibold text-gray-700"
+              >
+                Pilih User *
+              </Label>
               <Controller
                 name="user_id"
                 control={control}
@@ -131,13 +138,20 @@ const FormBooking = ({ isOpen, toggle }: Props) => {
                 }}
               />
               {errors.user_id && (
-                <p className="text-sm text-red-500">{errors.user_id.message}</p>
+                <p className="text-sm text-red-500 mt-1">
+                  {errors.user_id.message}
+                </p>
               )}
             </div>
 
             {/* Payment Type Select */}
-            <div className="space-y-2">
-              <Label htmlFor="payment_type">Tipe Pembayaran</Label>
+            <div className="space-y-3">
+              <Label
+                htmlFor="payment_type"
+                className="text-sm font-semibold text-gray-700"
+              >
+                Tipe Pembayaran *
+              </Label>
               <Controller
                 name="payment_type"
                 control={control}
@@ -153,15 +167,20 @@ const FormBooking = ({ isOpen, toggle }: Props) => {
                 )}
               />
               {errors.payment_type && (
-                <p className="text-sm text-red-500">
+                <p className="text-sm text-red-500 mt-1">
                   {errors.payment_type.message}
                 </p>
               )}
             </div>
 
             {/* Start Date */}
-            <div className="space-y-2">
-              <Label htmlFor="start_date">Tanggal Mulai</Label>
+            <div className="space-y-3">
+              <Label
+                htmlFor="start_date"
+                className="text-sm font-semibold text-gray-700"
+              >
+                Tanggal Mulai *
+              </Label>
               <Controller
                 name="start_date"
                 control={control}
@@ -188,15 +207,20 @@ const FormBooking = ({ isOpen, toggle }: Props) => {
                 )}
               />
               {errors.start_date && (
-                <p className="text-sm text-red-500">
+                <p className="text-sm text-red-500 mt-1">
                   {errors.start_date.message}
                 </p>
               )}
             </div>
 
             {/* Status Select */}
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
+            <div className="space-y-3">
+              <Label
+                htmlFor="status"
+                className="text-sm font-semibold text-gray-700"
+              >
+                Status
+              </Label>
               <Controller
                 name="status"
                 control={control}
@@ -210,13 +234,17 @@ const FormBooking = ({ isOpen, toggle }: Props) => {
                 )}
               />
               {errors.status && (
-                <p className="text-sm text-red-500">{errors.status.message}</p>
+                <p className="text-sm text-red-500 mt-1">
+                  {errors.status.message}
+                </p>
               )}
             </div>
 
             {/* Duration Chips */}
-            <div className="space-y-2">
-              <Label>Durasi</Label>
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold text-gray-700">
+                Durasi *
+              </Label>
               <Controller
                 name="duration"
                 control={control}
@@ -252,25 +280,38 @@ const FormBooking = ({ isOpen, toggle }: Props) => {
                 }}
               />
               {errors.duration && (
-                <p className="text-sm text-red-500">
+                <p className="text-sm text-red-500 mt-1">
                   {errors.duration.message}
                 </p>
               )}
             </div>
+
+            {/* Submit Button */}
+            <div className="pt-6 border-t border-gray-200">
+              <div className="flex gap-3 justify-end">
+                <Button
+                  onClick={toggle}
+                  type="button"
+                  variant="outline"
+                  className="px-6 text-green-600 hover:text-green-700 border-green-600 hover:border-green-700 hover:bg-green-50 flex items-center gap-2"
+                >
+                  <User2Icon />
+                  Tambah Users
+                </Button>
+                <Button
+                  type="submit"
+                  className="px-6 bg-blue-600 hover:bg-blue-700"
+                >
+                  Simpan Booking
+                </Button>
+              </div>
+            </div>
           </form>
         </div>
-
-        <DrawerFooter>
-          <Button onClick={handleSubmit(onSubmit)} disabled={isSubmitting}>
-            {isSubmitting ? "Menyimpan..." : "Simpan"}
-          </Button>
-          <Button onClick={onClose} variant="outline">
-            Batal
-          </Button>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+      </div>
+      <FormPenyewa isOpen={isOpen} toggle={toggle} />
+    </div>
   );
 };
 
-export default FormBooking;
+export default Booking;

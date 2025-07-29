@@ -14,6 +14,7 @@ import TipeKamar from "./pages/tipe-kamar";
 import DashboardHome from "./pages/dashboard-home";
 import FormTipeKamar from "./pages/form-tipe-kamar";
 import ProtectedRoute from "./config/protected-route";
+import Booking from "./pages/booking";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ function App() {
               <Route path="tipe-kamar/:id" element={<TipeKamar />} />
               <Route path="kosan/:id" element={<Kosan />} />
               <Route path="kamar/:id" element={<Kamar />} />
+              <Route path="booking/:id" element={<Booking />} />
             </Route>
           </Routes>
         </div>
